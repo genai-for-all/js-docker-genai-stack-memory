@@ -23,10 +23,35 @@ let llm_name = process.env.LLM
 const model = new ChatOllama({
   baseUrl: ollama_base_url,
   model: llm_name, 
-  temperature: 0,
-  repeatPenalty: 1,
+  temperature: 0.8,
+  repeatPenalty: 1.1,
   verbose: true,
 })
+
+/*
+repeatPenalty: (default 1.1)
+Sets how strongly to penalize repetitions. 
+A higher value (e.g., 1.5) will penalize repetitions more strongly, 
+while a lower value (e.g., 0.9) will be more lenient.
+*/
+
+/*
+stop: 🤔
+Sets the stop sequences to use. 
+When this pattern is encountered the LLM will stop generating text and return. 
+Multiple stop patterns may be set by specifying multiple separate stop parameters in a modelfile.
+*/
+
+/*
+repeat-last-n: 🤔
+Sets how far back for the model to look back to prevent repetition. (Default: 64, 0 = disabled, -1 = num_ctx)
+*/
+
+/* temperature: (default 0.8)
+The temperature of the model. 
+Increasing the temperature will make the model answer more creatively.
+*/
+
 
 const memory = new ConversationSummaryMemory({
   memoryKey: "history",
@@ -34,8 +59,6 @@ const memory = new ConversationSummaryMemory({
 })
 
 var controller = new AbortController()
-
-
 
 const fastify = Fastify({
   logger: true
