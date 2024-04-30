@@ -13,13 +13,24 @@
   <link rel="stylesheet" href="./css/bulma.min.css">
   <script src="./js/markdown-it.min.js"></script>
 
+
+
 </head>
   <body>
+    <script type="text/javascript" language="javascript">  
+      var versionUpdate = (new Date()).getTime();  
+      var script = document.createElement("script");  
+      script.type = "text/javascript";  
+      script.src = "./js/update.js?v=" + versionUpdate;  
+      document.body.appendChild(script);  
+    </script>  
+
     <div class="container">
       <div class="hero-body">
-        <p class="title is-2">
-          🟡 JS 🐳 Docker 🤖 GenAI Stack 🦜🔗🦙 [with 🧠 memory]
+        <p class="title is-3">
+          🟡 🐳 🤖 GenAI Stack 🦜🔗🦙 [with 🧠 memory]
         </p>
+        <span id="model_name" class="tag is-dark"></span>
       </div>
     </div>
 
@@ -28,14 +39,25 @@
       <div class="field">
         <label class="label">System</label>
         <div class="control">
-          <textarea id="txt_system" class="textarea is-link" rows="3" placeholder="Type your instructions here"></textarea>
+          <textarea id="txt_system" class="textarea is-link" rows="2" placeholder="Type your instructions here"></textarea>
         </div>
       </div>  
 
       <div class="field">
         <label class="label">Prompt</label>
+        <!-- help buttons-->
+        <div class="field is-grouped">
+          <div class="control">
+            <button data-target="modal-help-meta-prompts" class="js-modal-trigger button is-info is-light is-small">meta prompts</button>
+          </div>
+          <div class="control">
+            <button data-target="modal-help-detailed-prompt" class="js-modal-trigger button is-info is-light is-small">detailed prompt</button>
+          </div>
+        </div>
+        <!-- help buttons-->
+
         <div class="control">
-          <textarea id="txt_prompt" class="textarea is-primary" rows="8" placeholder="Type your question here"></textarea>
+          <textarea id="txt_prompt" class="textarea is-primary" rows="5" placeholder="Type your question here"></textarea>
         </div>
       </div>  
 
@@ -43,23 +65,23 @@
         <div class="field is-grouped">
 
           <div class="control">
-            <button id="btn_submit" class="button is-link">Submit</button>
+            <button id="btn_submit" class="button is-link is-small">Submit</button>
           </div>
           
           <div class="control">
-            <button id="btn_clear" class="button is-link is-warning">Clear the conversation summary</button>
+            <button id="btn_clear" class="button is-link is-warning is-small">Clear the conversation summary</button>
           </div>
 
           <div class="control">
-            <button id="btn_clear_answer" class="button is-link is-info">Clear the bot answer</button>
+            <button id="btn_clear_answer" class="button is-link is-info is-small">Clear the bot answer</button>
           </div>
 
           <div class="control">
-            <button id="btn_stop" class="button is-link is-danger">Stop</button>
+            <button id="btn_stop" class="button is-link is-danger is-small">Stop</button>
           </div>
 
           <div class="control">
-            <button id="btn_history" class="button is-success">Print conversation summary to the console</button>
+            <button id="btn_history" class="button is-success is-small">Print conversation summary to the console</button>
           </div>
 
         </div>
@@ -95,10 +117,147 @@
         <br>
       </div>
 
+      <!-- Help -->
+      <!-- Meta Prompts -->
+      <div id="modal-help-meta-prompts"" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <!-- card -->
+          <div class="card">
+            <div class="card-content">
+              <div id="md-meta-prompts" class="content"></div>
+            </div>
+          </div>
+          <!-- card -->
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+      </div>
 
+      <!-- Detailed Prompt -->
+      <div id="modal-help-detailed-prompt"" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <!-- card -->
+          <div class="card">
+            <div class="card-content">
+              <div id="md-detailed-prompt" class="content"></div>
+            </div>
+          </div>
+          <!-- card -->
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+      </div>
+
+      <!-- Help -->
     </div>
 
     <script type="module">
+      let mdMetaPromptsContent = document.querySelector("#md-meta-prompts")
+      try {
+        const response = await fetch("/md/meta-prompts.md", {
+            method: "GET",
+            headers: {
+              "Content-Type": "text/plain",
+            }
+          })
+        
+        const data = await response.text()
+        console.log(data)
+        mdMetaPromptsContent.innerHTML = markdownit().render(data)
+
+      } catch (error) {
+        mdMetaPromptsContent.innerHTML = markdownit().render(`😡 ${error}`)
+        console.log("😡", error) 
+      }
+
+      let mdDetailedPromptContent = document.querySelector("#md-detailed-prompt")
+      try {
+        const response = await fetch("/md/detailed-prompt.md", {
+            method: "GET",
+            headers: {
+              "Content-Type": "text/plain",
+            }
+          })
+        
+        const data = await response.text()
+        console.log(data)
+        mdDetailedPromptContent.innerHTML = markdownit().render(data)
+
+      } catch (error) {
+        mdMetaPromptsContent.innerHTML = markdownit().render(`😡 ${error}`)
+        console.log("😡", error) 
+      }
+
+    </script>
+
+    <script>
+
+      document.addEventListener('DOMContentLoaded', () => {
+        
+      // Functions to open and close a modal
+      function openModal($el) {
+        $el.classList.add('is-active');
+      }
+
+      function closeModal($el) {
+        $el.classList.remove('is-active');
+      }
+
+      function closeAllModals() {
+        (document.querySelectorAll('.modal') || []).forEach(($modal) => {
+          closeModal($modal);
+        });
+      }
+
+      // Add a click event on buttons to open a specific modal
+      (document.querySelectorAll('.js-modal-trigger') || []).forEach(($trigger) => {
+        const modal = $trigger.dataset.target;
+        const $target = document.getElementById(modal);
+
+        $trigger.addEventListener('click', () => {
+          openModal($target);
+        });
+      });
+
+      // Add a click event on various child elements to close the parent modal
+      (document.querySelectorAll('.modal-background, .modal-close, .modal-card-head .delete, .modal-card-foot .button') || []).forEach(($close) => {
+        const $target = $close.closest('.modal');
+
+        $close.addEventListener('click', () => {
+          closeModal($target);
+        });
+      });
+
+      // Add a keyboard event to close all modals
+      document.addEventListener('keydown', (event) => {
+        if(event.key === "Escape") {
+          closeAllModals();
+        }
+      });
+    });
+    </script>
+
+
+    <script type="module">
+
+      let modelName = document.querySelector("#model_name")
+      try {
+        const response = await fetch("/model", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            }
+          })
+        
+        const data = await response.json()
+
+        modelName.innerHTML = data.model
+
+        console.log(data)
+
+      } catch (error) {
+        console.log("😡", error) 
+      }
 
       // https://developer.mozilla.org/en-US/docs/Web/API/Streams_API/Using_readable_streams
 
@@ -264,6 +423,7 @@
 
       
     </script>
+
   </body>
 
 </html>

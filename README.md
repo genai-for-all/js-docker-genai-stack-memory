@@ -65,3 +65,10 @@ HTTP_PORT=8888 LLM=deepseek-coder OLLAMA_BASE_URL=http://ollama:11434 docker com
 ```bash
 HTTP_PORT=8888 LLM=deepseek-coder OLLAMA_BASE_URL=http://host.docker.internal:11434 docker compose --profile webapp watch
 ```
+
+## FAQ
+
+> **good to know:** ✋ How to fix `permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock`:
+> ```bash
+> sudo chmod 666 /var/run/docker.sock
+> ```

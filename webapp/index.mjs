@@ -20,13 +20,15 @@ import {
 let ollama_base_url = process.env.OLLAMA_BASE_URL
 let llm_name = process.env.LLM
 
-const model = new ChatOllama({
+const modelOptions = {
   baseUrl: ollama_base_url,
   model: llm_name, 
   temperature: 0.8,
   repeatPenalty: 1.1,
   verbose: true,
-})
+}
+
+const model = new ChatOllama(modelOptions)
 
 /*
 repeatPenalty: (default 1.1)
@@ -71,6 +73,10 @@ fastify.register(fastifyStatic, {
 
 const { ADDRESS = '0.0.0.0', HTTP_PORT = '8080' } = process.env;
 
+fastify.get('/model', async (request, reply) => {
+  return modelOptions
+})
+
 fastify.delete('/clear-history', async (request, reply) => {
   console.log("👋 clear conversation summary")
   memory.clear()
@@ -102,7 +108,7 @@ fastify.post('/prompt', async (request, reply) => {
     )
   ])
 
-
+  
   const outputParser = new StringOutputParser()
 
   model.bind({ signal: controller.signal })
