@@ -3,7 +3,7 @@ services:
   ollama:
     profiles: [container]
     #image: ollama/ollama:0.1.30
-    image: ollama/ollama:0.1.27
+    image: ollama/ollama:0.1.32
     volumes:
       - ollama-data:/root/.ollama
     ports:
